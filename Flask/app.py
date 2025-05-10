@@ -5,8 +5,8 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 import bcrypt
 import os
 
-from model import predict_image
-from utils import get_disease_info
+from .model import predict_image
+from .utils import get_disease_info
 
 app = Flask(__name__)
 
