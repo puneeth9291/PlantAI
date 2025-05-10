@@ -1,195 +1,379 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-  <title>Plant AI</title>
-  <!--meta tags -->
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!--//meta tags ends here-->
-  <!--booststrap-->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-  <!--//booststrap end-->
-
-  <!-- font-awesome icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
-    integrity="sha512-SfTiTlX6kk+qitfevl/7LibUOeJWlt9rbyDn92a1DqWOw9vWG2MFoays0sgObmWazO5BQPiFucnnEAjpAB+/Sw=="
-    crossorigin="anonymous" />
-  <!-- //font-awesome icons -->
-
-  <!--stylesheets-->
-  <link href="../static/styles/style.css" rel='stylesheet' type='text/css' media="all">
-  <!--//stylesheets-->
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plant AI - Your Plant Health Companion</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}">
 </head>
-
 <body>
-  <div class="main-top" id="home">
-    <!-- header -->
-    <div class="headder-top">
-      <!-- nav -->
-      <nav>
-        <div id="logo">
-          <h1><a href="index.html">Plant-AI</a></h1>
-        </div>
-        <label for="drop" class="toggle">Menu</label>
-        <input type="checkbox" id="drop">
-        <ul class="menu mt-2">
-          <li class="active"><a href="#home">Home</a></li>
-          <li><a href="#about">About</a></li>
-          <li><a href="#features">Features</a></li>
-          <li><a href="#test">Detect</a></li>
-        </ul>
-      </nav>
-      <!-- //nav -->
-    </div>
-    <!-- //header -->
-    <!-- banner -->
-    <div class="main-banner text-center">
-      <div class="container">
-        <div class="style-banner">
-          <h4 class="mb-2">Welcome To Plant AI</h4>
-          <h5>Offering Farming Solutions Worldwide
-          </h5>
-        </div>
-        <div class="two-demo-button mt-md-4 mt-3">
-          <p> Developing models for making disease detection easy and providing solutions for improving crop production
-          </p>
-        </div>
-
-      </div>
-    </div>
-  </div>
-  <!-- //banner -->
-
-  <!-- about -->
-  <section class="about py-lg-4 py-md-3 py-sm-3 py-3" id="about">
-    <div class="container py-lg-5 py-md-4 py-sm-4 py-3">
-      <div class="row">
-        <div class="col-lg-6 about-imgs-txt pt-3">
-          <img src="../static/images/4.jpg" alt="news image" class="img-fluid" style="border-radius: 8px;">
-        </div>
-        <div class="col-lg-6 text-justify about-two-grids pt-3">
-          <h3 class="title text-center">About</h3>
-          <div class="about-para-txt">
-            <p>Food security for billions of people on earth requires minimizing crop damage by timely detection of
-              diseases.Developing methods for detection of plant diseases serves the dual purpose of increasing crop
-              yield and reducing pesticide use without knowing about the proper disease. Along with development of
-              better crop varieties, disease detection is thus paramount goal for achieving food security. The
-              traditional method of disease detection has been to use manual examination by either farmers or experts,
-              which can be time consuming and costly, proving infeasible for millions of small and medium sized farms
-              around the world.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-  <!-- //about -->
-
-  <!-- service -->
-  <section class="service pb-5 " id="features">
-    <div class="container ">
-      <h3 class="title text-center mb-3">Features</h3>
-      <div class="row">
-        <div class="col-lg-4 col-md-6 col-sm-6 mt-lg-4 mt-3 service-grid-wthree text-center">
-          <div class="ser-Agriculture-grid">
-            <div class="about-icon mb-md-4 mb-3">
-              <span class="fa fa-viadeo" aria-hidden="true"></span>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#home">PlantAI</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item"><a class="nav-link" href="#home">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#seasons">Seasons</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#features">Features</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#test">Test</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#ask-expert">Ask Expert</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#community-forum">Community</a></li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    <div class="translate-wrapper">
+                        <div id="google_translate_element"></div>
+                    </div>
+                    <form action="{{ url_for('logout', **query_params) }}" method="POST">
+                        <button type="submit" class="btn btn-outline-danger">Logout</button>
+                    </form>
+                </div>
             </div>
-            <div class="ser-sevice-grid">
-              <h4 class="pb-3">Easy Detection</h4>
-              <p>Just need to click and upload leaf image.</p>
-            </div>
-          </div>
         </div>
-        <div class="col-lg-4 col-md-6 col-sm-6 mt-lg-4 mt-3 service-grid-wthree text-center">
-          <div class="ser-Agriculture-grid">
-            <div class="about-icon mb-md-4 mb-3">
-              <span class="fa fa-pagelines" aria-hidden="true"></span>
-            </div>
-            <div class="ser-sevice-grid">
-              <h4 class="pb-3">Cause and Solution</h4>
-              <p>Provides the cause and solution of the identified diseases.</p>
-            </div>
-          </div>
+    </nav>
+
+    <!-- Home Section -->
+    <section id="home" class="section">
+        <div class="container">
+            <h1>Welcome to PlantAI</h1>
+            <p>Your Intelligent Companion for Plant Health and Disease Detection</p>
+            <a href="#test" class="btn btn-primary">Scan Your Plant Now</a>
         </div>
-        <div class="col-lg-4 col-md-6 col-sm-6 mt-lg-4 mt-3 service-grid-wthree text-center">
-          <div class="ser-Agriculture-grid">
-            <div class="about-icon mb-md-4 mb-3">
-              <span class="fa fa-leaf" aria-hidden="true"></span>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6 mb-4 mb-md-0">
+                    <img src="{{ url_for('static', filename='images/plant_logo.png') }}" alt="Plant AI" class="img-fluid">
+                </div>
+                <div class="col-md-6">
+                    <h2>About PlantAI</h2>
+                    <p class="mt-3">PlantAI is an innovative platform designed to help farmers, gardeners, and plant enthusiasts maintain healthy plants. Using advanced AI technology, we detect plant diseases, provide seasonal care tips, and connect you with experts and a community of plant lovers.</p>
+                    <ul class="mt-3">
+                        <li>AI-powered disease detection</li>
+                        <li>Expert advice and community support</li>
+                        <li>Seasonal care tips for your plants</li>
+                    </ul>
+                </div>
             </div>
-            <div class="ser-sevice-grid">
-              <h4 class="pb-3">Large Plant Support</h4>
-              <p>Supports around 14 different types of plants.</p>
-            </div>
-          </div>
         </div>
-      </div>
-    </div>
-  </section>
+    </section>
 
+    <!-- Seasonal Diseases Section -->
+    <section id="seasons" class="section">
+        <div class="container">
+            <h2>Seasonal Plant Diseases</h2>
+            <div class="row mt-5">
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="season-card">
+                        <div class="season-icon summer"><i class="fas fa-sun"></i></div>
+                        <h4 class="text-center mb-3">Summer</h4>
+                        <ul>
+                            <li>High temperatures can stress plants</li>
+                            <li>Increased risk of fungal infections</li>
+                            <li>Water deficiency affects plant health</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="season-card">
+                        <div class="season-icon monsoon"><i class="fas fa-cloud-rain"></i></div>
+                        <h4 class="text-center mb-3">Monsoon</h4>
+                        <ul>
+                            <li>Excess moisture leads to root rot</li>
+                            <li>Fungal diseases like mildew thrive</li>
+                            <li>Poor drainage can harm plants</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="season-card">
+                        <div class="season-icon autumn"><i class="fas fa-leaf"></i></div>
+                        <h4 class="text-center mb-3">Autumn</h4>
+                        <ul>
+                            <li>Leaf spot diseases become common</li>
+                            <li>Cooler temperatures slow growth</li>
+                            <li>Prepare plants for winter dormancy</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="season-card">
+                        <div class="season-icon winter"><i class="fas fa-snowflake"></i></div>
+                        <h4 class="text-center mb-3">Winter</h4>
+                        <ul>
+                            <li>Frost can damage sensitive plants</li>
+                            <li>Reduced sunlight affects growth</li>
+                            <li>Protect roots from freezing</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-  <section class="blog_w3ls py-3 pb-5 pt-10" id="test">
-    <div class="container pb-xl-5 pb-lg-3">
-      <h3 class="title text-center mb-lg-5 mb-md-4 mb-sm-4 mb-3"> Test Your Plants</h3>
-      <div class="row" style="justify-content: center;">
-        <form action="{{ url_for('predict') }}" method="POST" enctype=multipart/form-data>
-          <div class="form-group text-center">
-            <label for="exampleFormControlFile1"><b>Input a file</b></label>
-            <input type="file" name="file" class="form-control-file" id="inputImage" onchange=previewImage(event)
-              required>
-            <br />
-            <button class="btn btn-primary" type="submit"> Predict </button>
-          </div>
-        </form>
-      </div>
-      <img id="output-image" class="rounded mx-auto d-block" />
-      <br />
-    </div>
+    <!-- Features Section -->
+    <section id="features" class="section">
+        <div class="container">
+            <h2>Our Features</h2>
+            <div class="row mt-5">
+                <div class="col-md-4 mb-4">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-seedling feature-icon"></i>
+                            <h5 class="card-title">Disease Detection</h5>
+                            <p class="card-text">Upload an image of your plant, and our AI will detect any diseases with high accuracy.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-user-md feature-icon"></i>
+                            <h5 class="card-title">Expert Advice</h5>
+                            <p class="card-text">Connect with plant experts to get personalized advice for your plant care.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-users feature-icon"></i>
+                            <h5 class="card-title">Community Forum</h5>
+                            <p class="card-text">Join a community of plant enthusiasts to share knowledge and experiences.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-  </section>
+    <!-- Test Section -->
+    <section id="test" class="section">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 mx-auto text-center">
+                    <h2 class="mb-4">Scan Your Plant</h2>
+                    <form action="{{ url_for('predict', **query_params) }}" method="POST" enctype="multipart/form-data">
+                        <div class="upload-box mb-4">
+                            <input type="file" name="file" id="fileInput" accept="image/*" required hidden>
+                            <label for="fileInput" class="d-block text-center">
+                                <i class="fas fa-upload fa-2x mb-2"></i>
+                                <p>Click to upload an image of your plant</p>
+                            </label>
+                            <div id="imagePreview" class="mt-3"></div>
+                        </div>
+                        <button type="submit" class="btn btn-success">Diagnose</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
 
-  <!-- footer -->
-  <footer>
-    <div class="container pt-5 pb-3">
-      <div class="footer-w3layouts-head text-center">
-        <h2><a href="index.html">Plant-AI</a></h2>
-      </div>
-      <div class="bottem-wthree-footer text-center pt-md-4 pt-3">
-        <p>
-          All Rights Reserved | Design by Soumyajit
-        </p>
-      </div>
-      <!-- move icon -->
-      <div class="text-center">
-        <a href="#home" class="move-top text-center mt-3"><i class="fa fa-arrow-up" aria-hidden="true"></i></a>
-      </div>
-      <!--//move icon -->
-    </div>
-  </footer>
-  <!--//footer -->
+    <!-- Ask an Expert Section -->
+    <section id="ask-expert" class="section">
+        <div class="container">
+            <h2 class="text-center mb-5">Ask an Expert</h2>
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="expert-profile row align-items-center">
+                        <div class="col-md-4">
+                            <img src="{{ url_for('static', filename='images/indian-supportive-agro-scientist.jpg') }}" alt="Expert 1" class="img-fluid">
+                        </div>
+                        <div class="col-md-8 py-3">
+                            <h4>Dr. Anil Sharma</h4>
+                            <p class="text-muted">Agro Scientist</p>
+                            <a href="https://wa.me/+919676900799?text=Hello%20Dr.%20Sharma,%20I%20need%20help%20with%20my%20plant!" target="_blank" class="btn btn-success">
+                                <i class="fab fa-whatsapp"></i> Chat on WhatsApp
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="expert-profile row align-items-center">
+                        <div class="col-md-4">
+                            <img src="{{ url_for('static', filename='images/shes-expert-life-processes.jpg') }}" alt="Expert 2" class="img-fluid">
+                        </div>
+                        <div class="col-md-8 py-3">
+                            <h4>Dr. Priya Mehra</h4>
+                            <p class="text-muted">Botanist</p>
+                            <a href="https://wa.me/+918143634498?text=Hello%20Dr.%20Mehra,%20I%20need%20help%20with%20my%20plant!" target="_blank" class="btn btn-success">
+                                <i class="fab fa-whatsapp"></i> Chat on WhatsApp
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-5">
+                <div class="col-md-8 mx-auto">
+                    <div class="chat-container">
+                        <h4 class="text-center text-white mb-4">Chat with PlantAI Assistant</h4>
+                        <div class="chat-history mb-4">
+                            <div class="message user-message">
+                                <div class="message-content">
+                                    <p>Hello! My plant has yellow leaves. What should I do?</p>
+                                    <span class="message-time">10:30 AM</span>
+                                </div>
+                            </div>
+                            <div class="message expert-message">
+                                <div class="message-content">
+                                    <p>Yellow leaves can indicate overwatering or nutrient deficiency. Check the soil moisture and consider a balanced fertilizer.</p>
+                                    <span class="message-time">10:32 AM</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <a href="https://wa.me/+917036115744?text=Hello%20PlantAI%20Assistant,%20I%20need%20help%20with%20my%20plant!" target="_blank" class="btn btn-success">
+                                <i class="fab fa-whatsapp"></i> Contact PlantAI Assistant on WhatsApp
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-    integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-    crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-    crossorigin="anonymous"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
-    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
-    crossorigin="anonymous"></script>
+    <!-- Community Forum Section (Updated to User Reviews) -->
+    <section id="community-forum" class="section">
+        <div class="container">
+            <h2 class="text-center mb-3">User Reviews</h2>
+            <p class="text-center mb-5">Share your experience with PlantAI and help us improve! Your feedback matters.</p>
+            
+            <!-- Create Review -->
+            <div class="row mb-5">
+                <div class="col-md-6 mx-auto">
+                    <form action="{{ url_for('create_post', **query_params) }}" method="POST" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <textarea class="form-control forum-textarea" name="content" placeholder="Share your feedback about PlantAI..." required></textarea>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <button type="button" class="btn btn-outline-primary" id="forumAttachButton">
+                                <i class="fas fa-paperclip"></i> Upload
+                            </button>
+                            <input type="file" id="forumImageUpload" name="images" multiple accept="image/*" hidden>
+                            <button type="submit" class="btn btn-primary">Post Review</button>
+                        </div>
+                        <div id="forumImagePreview" class="d-flex flex-wrap gap-2"></div>
+                    </form>
+                </div>
+            </div>
 
-  <script>
-    function previewImage(event) {
-      var reader = new FileReader();
-      reader.onload = function () {
-        var output = document.getElementById('output-image')
-        output.src = reader.result;
-      }
-      reader.readAsDataURL(event.target.files[0]);
-    }
-  </script>
+            <!-- Reviews -->
+            <div class="row">
+                <div class="col-md-6 mx-auto">
+                    {% for post in posts %}
+                        <div class="forum-post mb-4">
+                            <p><strong>{{ post.user.name }}</strong></p>
+                            <p>{{ post.content }}</p>
+                            {% if post.images %}
+                                <div class="d-flex flex-wrap gap-2 mb-2">
+                                    {% for image in post.images.split(',') %}
+                                        <img src="{{ url_for('static', filename='Uploads/forum_images/' + image) }}" class="forum-image" alt="Review Image">
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="d-flex justify-content-between align-items-center">
+                                <form action="{{ url_for('like_post', post_id=post.id, **query_params) }}" method="POST">
+                                    <button type="submit" class="btn btn-link p-0">
+                                        <i class="fas fa-heart {% if current_user.is_authenticated and current_user.id in post.liked_by|map(attribute='id')|list %}text-danger{% else %}text-muted{% endif %}"></i>
+                                        {{ post.likes }} {% if post.likes == 1 %}Like{% else %}Likes{% endif %}
+                                    </button>
+                                </form>
+                                {% if current_user.id == post.user_id %}
+                                    <form action="{{ url_for('delete_post', post_id=post.id, **query_params) }}" method="POST">
+                                        <button type="submit" class="btn btn-link text-danger">Delete</button>
+                                    </form>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show position-fixed w-100" role="alert" style="z-index: 9999; top: 0;">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                includedLanguages: 'hi,ta,te,kn,ml,bn,gu,mr,pa,or', // Indian languages only
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+                autoDisplay: false
+            }, 'google_translate_element');
+
+            const lang = new URLSearchParams(window.location.search).get('lang');
+            if (lang) {
+                const select = document.querySelector('.goog-te-combo');
+                if (select) {
+                    select.value = lang;
+                    select.dispatchEvent(new Event('change'));
+                }
+            }
+
+            document.querySelector('.goog-te-combo')?.addEventListener('change', function() {
+                const selectedLang = this.value;
+                const currentUrl = new URL(window.location);
+                currentUrl.searchParams.set('lang', selectedLang);
+                window.location.href = currentUrl.toString();
+            });
+        }
+    </script>
+    <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    <script>
+        // File Upload Preview for Test Section
+        document.getElementById('fileInput')?.addEventListener('change', function(e) {
+            const preview = document.getElementById('imagePreview');
+            preview.innerHTML = '';
+            const file = e.target.files[0];
+            if (file) {
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(file);
+                img.className = 'img-fluid rounded';
+                img.style.maxHeight = '200px';
+                preview.appendChild(img);
+            }
+        });
+
+        // Forum Image Upload Preview
+        document.getElementById('forumAttachButton')?.addEventListener('click', function() {
+            document.getElementById('forumImageUpload').click();
+        });
+
+        document.getElementById('forumImageUpload')?.addEventListener('change', function(e) {
+            const preview = document.getElementById('forumImagePreview');
+            preview.innerHTML = '';
+            const files = e.target.files;
+            for (let i = 0; i < Math.min(files.length, 3); i++) {
+                const file = files[i];
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(file);
+                img.className = 'img-fluid rounded';
+                img.style.maxHeight = '100px';
+                preview.appendChild(img);
+            }
+        });
+    </script>
 </body>
-
 </html>

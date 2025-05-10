@@ -1,29 +1,228 @@
-from flask import Flask, render_template, jsonify, request, Markup
+from flask import Flask, render_template, request, redirect, url_for, flash, session
+from werkzeug.utils import secure_filename
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+import bcrypt
+import os
+
 from model import predict_image
-import utils
+from utils import get_disease_info
 
 app = Flask(__name__)
 
+# Configuration
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'default-secret-key-for-local-dev')  # Use environment variable
+app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static', 'Uploads')  # Ensure absolute path
+app.config['FORUM_UPLOAD_FOLDER'] = os.path.join(app.config['UPLOAD_FOLDER'], 'forum_images')
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///users.db')  # Use environment variable for database
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Initialize extensions
+db = SQLAlchemy(app)
+login_manager = LoginManager(app)
+login_manager.login_view = 'login'
+
+# Association table for likes (many-to-many relationship)
+post_likes = db.Table('post_likes',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
+    db.Column('post_id', db.Integer, db.ForeignKey('post.id'))
+)
+
+# User model
+class User(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(100), unique=True, nullable=False)
+    password = db.Column(db.LargeBinary(120), nullable=False)
+    posts = db.relationship('Post', backref='user', lazy=True)
+    liked_posts = db.relationship('Post', secondary=post_likes, backref=db.backref('liked_by', lazy='dynamic'))
+
+# Post model for User Reviews
+class Post(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    images = db.Column(db.String(500))
+    likes = db.Column(db.Integer, default=0)
+
+# User loader for Flask-Login
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+# Allowed file extensions
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+# Create database
+with app.app_context():
+    db.create_all()
 
 @app.route('/', methods=['GET'])
+@login_required
 def home():
-    return render_template('index.html')
-
+    query_params = request.args.to_dict()
+    posts = Post.query.order_by(Post.id.desc()).all()  # Fetch all posts, newest first
+    return render_template('index.html', query_params=query_params, posts=posts)
 
 @app.route('/predict', methods=['GET', 'POST'])
+@login_required
 def predict():
+    query_params = request.args.to_dict()
     if request.method == 'POST':
+        if 'file' not in request.files:
+            flash('No file uploaded', 'danger')
+            return redirect(url_for('home', **query_params))
+        file = request.files['file']
+        if file.filename == '':
+            flash('No file selected', 'danger')
+            return redirect(url_for('home', **query_params))
+        if not allowed_file(file.filename):
+            flash('Invalid file type. Only PNG, JPG, JPEG, GIF allowed.', 'danger')
+            return redirect(url_for('home', **query_params))
+
+        filename = secure_filename(file.filename)
+        os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(filepath)
+
         try:
-            file = request.files['file']
-            img = file.read()
-            prediction = predict_image(img)
-            print(prediction)
-            res = Markup(utils.disease_dic[prediction])
-            return render_template('display.html', status=200, result=res)
-        except:
-            pass
-    return render_template('index.html', status=500, res="Internal Server Error")
+            with open(filepath, 'rb') as f:
+                img_bytes = f.read()
+            predicted_label = predict_image(img_bytes)
+            info = get_disease_info(predicted_label)
+        except Exception as e:
+            flash(f'Error processing image: {str(e)}', 'danger')
+            return redirect(url_for('home', **query_params))
 
+        return render_template('display.html', filename=filename, **info, query_params=query_params)
+    return render_template('index.html', query_params=query_params)
 
-if __name__ == "__main__":
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    query_params = request.args.to_dict()
+    if current_user.is_authenticated:
+        return redirect(url_for('home', **query_params))
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        user = User.query.filter_by(email=email).first()
+        if user and bcrypt.checkpw(password.encode('utf-8'), user.password):
+            login_user(user)
+            return redirect(url_for('home', **query_params))
+        else:
+            flash('Invalid email or password', 'danger')
+    return render_template('login.html', query_params=query_params)
+
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    query_params = request.args.to_dict()
+    if current_user.is_authenticated:
+        return redirect(url_for('home', **query_params))
+    if request.method == 'POST':
+        name = request.form['name']
+        email = request.form['email']
+        password = request.form['password']
+        confirm_password = request.form['confirm_password']
+
+        if len(password) < 8 or not any(c.isdigit() for c in password) or not any(c in '!@#$%^&*()' for c in password):
+            flash('Password must be at least 8 characters with 1 number and 1 special character', 'danger')
+            return redirect(url_for('signup', **query_params))
+        if password != confirm_password:
+            flash('Passwords do not match', 'danger')
+            return redirect(url_for('signup', **query_params))
+
+        if User.query.filter_by(email=email).first():
+            flash('Email already registered', 'danger')
+            return redirect(url_for('signup', **query_params))
+
+        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+        new_user = User(name=name, email=email, password=hashed_password)
+        db.session.add(new_user)
+        db.session.commit()
+        flash('Account created! Please log in.', 'success')
+        return redirect(url_for('login', **query_params))
+    return render_template('signup.html', query_params=query_params)
+
+@app.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    query_params = request.args.to_dict()
+    if current_user.is_authenticated:
+        return redirect(url_for('home', **query_params))
+    if request.method == 'POST':
+        email = request.form['email']
+        user = User.query.filter_by(email=email).first()
+        if user:
+            flash('A password reset link has been sent to your email.', 'success')
+        else:
+            flash('Email not found', 'danger')
+        return redirect(url_for('login', **query_params))
+    return render_template('forgot-password.html', query_params=query_params)
+
+@app.route('/logout', methods=['POST'])
+@login_required
+def logout():
+    query_params = request.args.to_dict()
+    logout_user()
+    flash('You have been logged out', 'success')
+    return redirect(url_for('login', **query_params))
+
+@app.route('/create_post', methods=['POST'])
+@login_required
+def create_post():
+    query_params = request.args.to_dict()
+    content = request.form['content']
+    images = request.files.getlist('images')
+    image_filenames = []
+
+    if images and images[0].filename != '':
+        os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], 'forum_images'), exist_ok=True)
+        for image in images[:3]:
+            filename = secure_filename(image.filename)
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], 'forum_images', filename)
+            image.save(filepath)
+            image_filenames.append(filename)
+
+    new_post = Post(
+        user_id=current_user.id,
+        content=content,
+        images=','.join(image_filenames) if image_filenames else None
+    )
+    db.session.add(new_post)
+    db.session.commit()
+    flash('Review posted successfully!', 'success')
+    return redirect(url_for('home', **query_params) + '#community-forum')
+
+@app.route('/like_post/<int:post_id>', methods=['POST'])
+@login_required
+def like_post(post_id):
+    query_params = request.args.to_dict()
+    post = Post.query.get_or_404(post_id)
+    if current_user in post.liked_by:
+        post.liked_by.remove(current_user)
+        post.likes = max(0, post.likes - 1)
+        flash('Like removed', 'success')
+    else:
+        post.liked_by.append(current_user)
+        post.likes += 1
+        flash('Post liked!', 'success')
+    db.session.commit()
+    return redirect(url_for('home', **query_params) + '#community-forum')
+
+@app.route('/delete_post/<int:post_id>', methods=['POST'])
+@login_required
+def delete_post(post_id):
+    query_params = request.args.to_dict()
+    post = Post.query.get_or_404(post_id)
+    if post.user_id != current_user.id:
+        flash('You can only delete your own posts', 'danger')
+        return redirect(url_for('home', **query_params) + '#community-forum')
+    db.session.delete(post)
+    db.session.commit()
+    flash('Post deleted successfully!', 'success')
+    return redirect(url_for('home', **query_params) + '#community-forum')
+
+if __name__ == '__main__':
     app.run(debug=True)
