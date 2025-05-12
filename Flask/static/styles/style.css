@@ -690,7 +690,7 @@ ul {
 }
 
 /* ----------------------------------- */
-/* Styles for Authentication Pages (login.html, signup.html, forgot-password.html) */
+/* Styles for Authentication Pages (login.html, signup.html, forgotpassword.html) */
 /* ----------------------------------- */
 
 .auth-section {
@@ -737,6 +737,38 @@ ul {
   color: #555;
 }
 
+/* Google Sign-In Button */
+.btn-outline-dark {
+  border-color: #333;
+  color: #333;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+}
+
+.btn-outline-dark:hover {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  color: #fff;
+}
+
+.btn-outline-dark .fa-google {
+  margin-right: 8px;
+}
+
+/* Flash Messages */
+.alert-info {
+  background-color: #e7f3fe;
+  border-color: #b6d4fe;
+  color: #0a58ca;
+  border-radius: 8px;
+  padding: 1rem;
+  font-size: 0.95rem;
+}
+
 /* ----------------------------------- */
 /* Responsive Styles (Applies to All Pages) */
 /* ----------------------------------- */
@@ -767,6 +799,12 @@ ul {
     margin-left: 15%;
     margin-right: 15%;
   }
+
+  /* Ensure Google button scales well */
+  .btn-outline-dark {
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+  }
 }
 
 @media (max-width: 767px) {
@@ -793,5 +831,16 @@ ul {
   .treatment-section {
     padding-left: 0;
   }
-}
 
+  /* Adjust form elements for smaller screens */
+  .form-control,
+  .btn-success,
+  .btn-outline-dark {
+    font-size: 0.85rem;
+  }
+
+  .password-rules,
+  .form-text {
+    font-size: 0.8rem;
+  }
+}

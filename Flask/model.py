@@ -42,8 +42,8 @@ num_classes = [
 model = Plant_Disease_Model()
 
 # Use a relative path for the model file
-model_path = os.path.join(os.path.dirname(__file__), 'Models', 'plantDisease-resnet34.pth')
 
+model_path = os.path.join(os.path.dirname(__file__), '..', 'Models', 'plantDisease-resnet34.pth')
 # Debug print to confirm the file exists
 print("Model path exists:", os.path.exists(model_path))
 
