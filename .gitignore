@@ -5,3 +5,4 @@ users.db
 .hintrc
 .vscode/
 Flask/.env
+Flask/static/uploads/
