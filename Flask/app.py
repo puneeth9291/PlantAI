@@ -150,7 +150,7 @@ def login():
         if user and user.auth_provider == 'google':
             flash("Please sign in using Google.", 'danger')
             return redirect(url_for('login', **query_params))
-        if user and user.password and bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8')):
+        if user and user.password and bcrypt.checkpw(password.encode('utf-8'), user.password):
             login_user(user)
             flash('Logged in successfully', 'success')
             return redirect(url_for('home', **query_params))

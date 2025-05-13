@@ -42,7 +42,6 @@ num_classes = [
 model = Plant_Disease_Model()
 
 # Use a relative path for the model file
-
 model_path = os.path.join(os.path.dirname(__file__), '..', 'Models', 'plantDisease-resnet34.pth')
 # Debug print to confirm the file exists
 print("Model path exists:", os.path.exists(model_path))
@@ -52,15 +51,17 @@ model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
 model.eval()
 
 def predict_image(img: bytes) -> str:
+    # Convert bytes to PIL Image and apply transformations
     img_pil = Image.open(io.BytesIO(img))
     tensor = transform(img_pil).unsqueeze(0)
+
+    # Make prediction
     yb = model(tensor)
-    
     probs = F.softmax(yb, dim=1)
     confidence, preds = torch.max(probs, dim=1)
-    
-    # Set a confidence threshold (e.g., 0.7)
-    if confidence.item() < 0.3:
-        return "Unknown or Invalid Image"
-    
+
+    # Set a stricter confidence threshold (increased from 0.3 to 0.5)
+    if confidence.item() < 0.5:
+        return "Error: Unable to identify the image. Please upload a clear image of a leaf."
+
     return num_classes[preds.item()]
