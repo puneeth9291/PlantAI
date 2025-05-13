@@ -24,13 +24,10 @@ app.config['FORUM_UPLOAD_FOLDER'] = os.path.join(app.config['UPLOAD_FOLDER'], 'f
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
 # Database configuration for deployment
-# Database configuration for deployment
 default_db_uri = 'sqlite:///C:/Users/91967/db/users.db' if os.name == 'nt' else 'sqlite:///instance/users.db'
 db_uri = os.getenv('DATABASE_URL', default_db_uri)
 app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-
 
 # Email configuration for password reset
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
@@ -46,6 +43,11 @@ migrate = Migrate(app, db)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 mail = Mail(app)
+
+# Run migrations automatically on app startup
+from flask_migrate import upgrade
+with app.app_context():
+    upgrade()
 
 # OAuth setup for Google Sign-In
 oauth = OAuth(app)
@@ -95,8 +97,8 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # Create database (initial creation, migrations handle updates)
-# with app.app_context():
-#     db.create_all()
+with app.app_context():
+    db.create_all()
 
 @app.route('/', methods=['GET'])
 @login_required

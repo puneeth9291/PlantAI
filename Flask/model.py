@@ -7,6 +7,7 @@ from PIL import Image
 import torch.nn.functional as F
 import io
 import os
+import requests  # Add this import for downloading the model
 
 class Plant_Disease_Model(nn.Module):
     def __init__(self):
@@ -41,10 +42,24 @@ num_classes = [
 
 model = Plant_Disease_Model()
 
-# Use a relative path for the model file
-model_path = os.path.join(os.path.dirname(__file__), '..', 'Models', 'plantDisease-resnet34.pth')
-# Debug print to confirm the file exists
-print("Model path exists:", os.path.exists(model_path))
+# Define the path where the model file should be stored
+model_dir = os.path.join(os.path.dirname(__file__), '..', 'Models')
+model_path = os.path.join(model_dir, 'plantDisease-resnet34.pth')
+
+# URL to download the model file
+model_url = "https://github.com/puneeth9291/PlantAI/releases/download/v1.0.0/plantDisease-resnet34.pth"
+
+# Download the model file if it doesn't exist
+if not os.path.exists(model_path):
+    print(f"Downloading model file from {model_url}...")
+    os.makedirs(model_dir, exist_ok=True)
+    response = requests.get(model_url)
+    if response.status_code == 200:
+        with open(model_path, 'wb') as f:
+            f.write(response.content)
+        print("Model file downloaded successfully.")
+    else:
+        raise Exception(f"Failed to download model file from {model_url}. Status code: {response.status_code}")
 
 # Load model
 model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
